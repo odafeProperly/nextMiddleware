@@ -1,34 +1,76 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+This is a POC for implementation of Next Middleware and Amplictute client A/B Testing.
 
 ## Getting Started
 
-First, run the development server:
+Install THE BETA version of nextJS that supports middleware and amplitude-JS:
 
 ```bash
-npm run dev
-# or
-yarn dev
+npm install next@canary
+npm install amplitude-js
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+In the root of the application create a file called middleware.js (ts) and export a niddleware fuction like below
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+```bash
+export function middleware(req){
+#   add any line of code to be executed by the middleware
+}
+```
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Scenarios and Use cases
 
-## Learn More
+### Accesing the request body
+```sh
+# NextRequest class extends the Requst Interface of the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API)
 
-To learn more about Next.js, take a look at the following resources:
+# This gives access to importand properties like headers, cookies, path ets
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Limiting the middleware to run on certain pages
 
-## Deploy on Vercel
+With the release of @canary version of nextJS, Vercel enforced that the middleware file be located at the root of the project as seen [here](https://nextjs.org/docs/messages/nested-middleware). 
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For this reason, we re able to specify the endpoints we want to run a middleware as shown below.
+```bash
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+ const routesToUseMiddleware = ['/'];
+ const path = req.nextUrl.pathname
+
+ if (routesToUseMiddleware.includes(path)) {
+     #execute middleware function
+ }
+
+ # Also we can have specific fuctions to run depending on the path 
+
+  if (path.startsWith('/area')) {
+    // This logic is only applied to /area
+  }
+
+  if (path.startsWith('/buy/')) {
+    // This logic is only applied to /buy
+  }
+
+
+```
+
+
+### Using amplitude fo A/B testing
+```bash
+    import amplitude from 'amplitude-js';
+
+    let amplitudeInit = amplitude.getInstance().init("API_KEY")
+```
+
+## Resources
+[NextJS official docs on Next Middleware](http://localhost:3000) with your browser to see the result.
+
+[Vercel git examples for edge cases](https://github.com/vercel/examples/tree/main/edge-functions)
+
+[Vercel mIDDLEWARE API Refernces](https://vercel.com/docs/concepts/functions/edge-functions/middleware-api#)
+
+[Edge Functions](https://nextjs.org/docs/api-reference/edge-runtime) 
+
+[Amplititude Docs for amplitude-js](https://developers.amplitude.com/docs/javascript)
+
